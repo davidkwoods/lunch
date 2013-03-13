@@ -9,20 +9,20 @@ mountFolder = (connect, dir) ->
 # use this if you want to match all subfolders:
 # 'test/spec/**/*.js'
 module.exports = (grunt) ->
-  
+
   # load all grunt tasks
   require("matchdep").filterDev("grunt-*").forEach grunt.loadNpmTasks
-  
+
   # configurable paths
   yeomanConfig =
-    app: "app"
-    deploy: "deploy"
-
+    src: "source"
+    release: "release"
+  
   grunt.initConfig
-    yeoman: yeomanConfig
+    y: yeomanConfig
     watch:
       coffee:
-        files: ["<%= yeoman.app %>/scripts/{,*/}*.coffee"]
+        files: ["<%= y.src %>/scripts/{,*/}*.coffee"]
         tasks: ["coffee:deploy"]
 
       coffeeTest:
@@ -30,61 +30,62 @@ module.exports = (grunt) ->
         tasks: ["coffee:test"]
 
       jade:
-        files: ["<%= yeoman.app %>/*.jade"]
-        tasks: ["jade:deploy"]
+        files: ["<%= y.src %>/*.jade"]
+        tasks: ["jade:debug"]
 
       stylus:
-        files: ["<%= yeoman.app %>/*.styl"]
-        tasks: ["styl:deploy"]
+        files: ["<%= y.src %>/*.styl"]
+        tasks: ["styl:debug"]
 
       livereload:
-        files: ["<%= yeoman.deploy %>/*.html", "{.tmp,<%= yeoman.deploy %>}/styles/{,*/}*.css", "{.tmp,<%= yeoman.deploy %>}/scripts/{,*/}*.js", "<%= yeoman.deploy %>/images/{,*/}*.{png,jpg,jpeg,webp}"]
+        files: [".tmp/*.html", ".tmp/*.css", ".tmp/scripts/{,*/}*.js", "<%= y.src %>/images/{,*/}*.{png,svg,jpg,jpeg,webp}"]
         tasks: ["livereload"]
 
     connect:
       options:
         port: 9000
-        
         # change this to '0.0.0.0' to access the server from outside
         hostname: "localhost"
 
       livereload:
         options:
-          middleware: (connect) ->
-            [lrSnippet, mountFolder(connect, ".tmp"), mountFolder(connect, "deploy")]
+          middleware: (connect) -> [
+            lrSnippet, mountFolder(connect, ".tmp"), 
+            mountFolder(connect, "source") 
+          ]
 
-      test:
-        options:
-          middleware: (connect) ->
-            [mountFolder(connect, ".tmp"), mountFolder(connect, "test")]
+            #test:
+            #options:
+            #middleware: (connect) ->
+            #[mountFolder(connect, ".tmp"), mountFolder(connect, "test")]
 
-      deploy:
-        options:
-          middleware: (connect) ->
-            [mountFolder(connect, "deploy")]
+            #deploy:
+            #options:
+            #middleware: (connect) ->
+            #[mountFolder(connect, "deploy")]
 
     open:
       server:
         path: "http://localhost:<%= connect.options.port %>"
 
     clean:
-      deploy: [".tmp", "<%= yeoman.deploy %>/*"]
-      server: ".tmp"
+      release: [".tmp", "<%= y.release %>/*"]
+      debug: ".tmp"
 
     jshint:
       options:
         jshintrc: ".jshintrc"
 
-      all: ["Gruntfile.js", "<%= yeoman.app %>/scripts/{,*/}*.js", "!<%= yeoman.app %>/scripts/vendor/*", "test/spec/{,*/}*.js"]
+      all: ["Gruntfile.js", "<%= y.src %>/scripts/{,*/}*.js", "!<%= y.src %>/scripts/vendor/*", "test/spec/{,*/}*.js"]
 
     coffee:
       deploy:
         files: [
-          
+
           # rather than compiling multiple files here you should
           # require them into your main .coffee file
           expand: true
-          cwd: "<%= yeoman.app %>/scripts"
+          cwd: "<%= y.src %>/scripts"
           src: "*.coffee"
           dest: ".tmp/scripts"
           ext: ".js"
@@ -99,9 +100,9 @@ module.exports = (grunt) ->
         ]
 
     jade:
-      deploy:
-        files: grunt.file.expandMapping(["*.jade"], "deploy/",
-          cwd: "app"
+      release:
+        files: grunt.file.expandMapping(["*.jade"], "release/",
+          cwd: "source"
           rename: (base, path) ->
             base + path.replace(/\.jade$/, ".html")
         )
@@ -111,9 +112,9 @@ module.exports = (grunt) ->
           data:
             title: "hello from gruntfile"
 
-      server:
-        files: grunt.file.expandMapping(["*.jade"], "deploy/",
-          cwd: "app"
+      debug:
+        files: grunt.file.expandMapping(["*.jade"], ".tmp/",
+          cwd: "source"
           rename: (base, path) ->
             base + path.replace(/\.jade$/, ".html")
         )
@@ -124,110 +125,107 @@ module.exports = (grunt) ->
             title: "hello from gruntfile"
 
     stylus:
-      all:
-        files: grunt.file.expandMapping(["*.styl"], "deploy/",
-          cwd: "app"
+      release:
+        files: grunt.file.expandMapping(["*.styl"], "release/",
+          cwd: "source"
           rename: (base, path) ->
             base + path.replace(/\.styl$/, ".css")
         )
         options:
           compress: false
           paths: ["node_modules/grunt-contrib-stylus/node_modules"]
-    
+
+      debug:
+        files: grunt.file.expandMapping(["*.styl"], ".tmp/",
+          cwd: "source"
+          rename: (base, path) ->
+            base + path.replace(/\.styl$/, ".css")
+        )
+        options:
+          compress: false
+          paths: ["node_modules/grunt-contrib-stylus/node_modules"]
+
     # not used since Uglify task does concat, avail if needed
     #concat: { deploy: {} },
 
     uglify:
       deploy:
         files:
-          "<%= yeoman.deploy %>/scripts/main.js": ["<%= yeoman.app %>/scripts/{,*/}*.js"]
+          "<%= y.release %>/scripts/main.js": ["<%= y.src %>/scripts/{,*/}*.js"]
 
     useminPrepare:
-      html: "<%= yeoman.app %>/index.html"
+      html: "<%= y.src %>/index.html"
       options:
-        dest: "<%= yeoman.deploy %>"
+        dest: "<%= y.release %>"
 
     usemin:
-      html: ["<%= yeoman.deploy %>/{,*/}*.html"]
-      css: ["<%= yeoman.deploy %>/styles/{,*/}*.css"]
+      html: ["<%= y.release %>/{,*/}*.html"]
+      css: ["<%= y.release %>/styles/{,*/}*.css"]
       options:
-        dirs: ["<%= yeoman.deploy %>"]
+        dirs: ["<%= y.release %>"]
 
     imagemin:
       deploy:
         files: [
           expand: true
-          cwd: "<%= yeoman.app %>/images"
+          cwd: "<%= y.src %>/images"
           src: "{,*/}*.{png,jpg,jpeg}"
-          dest: "<%= yeoman.deploy %>/images"
+          dest: "<%= y.release %>/images"
         ]
 
     cssmin:
       deploy:
         files:
-          "<%= yeoman.deploy %>/styles/main.css": [".tmp/styles/{,*/}*.css", "<%= yeoman.app %>/styles/{,*/}*.css"]
+          "<%= y.release %>/styles/main.css": [".tmp/styles/{,*/}*.css", "<%= y.src %>/styles/{,*/}*.css"]
 
     htmlmin:
       deploy:
         options: {}
         files: [
           expand: true
-          cwd: "<%= yeoman.app %>"
+          cwd: "<%= y.src %>"
           src: "*.html"
-          dest: "<%= yeoman.deploy %>"
+          dest: "<%= y.release %>"
         ]
 
     copy:
-      deploy:
+      release:
         files: [
           expand: true
           dot: true
-          cwd: "<%= yeoman.app %>"
-          dest: "<%= yeoman.deploy %>"
-          src: ["*.{ico,txt}", ".htaccess"]
-        ]
-
-      server:
-        files: [
-          expand: true
-          dot: true
-          cwd: "<%= yeoman.app %>"
-          dest: "<%= yeoman.deploy %>"
-          src: ["logo", "*.{ico,txt}", "*.html", "**/*.{css,svg,png,jpg}", ".htaccess"]
+          cwd: "<%= y.src %>"
+          dest: "<%= y.release %>"
+          src: ["logo", "*.{ico,txt}", "**/*.{,svg,png,jpg}", ".htaccess"]
         ]
 
     bower:
       all:
-        rjsConfig: "<%= yeoman.app %>/scripts/main.js"
+        rjsConfig: "<%= y.src %>/scripts/main.js"
 
   grunt.renameTask "regarde", "watch"
 
-  grunt.registerTask "server", (target) ->
-    return grunt.task.run(["build", "open", "connect:deploy:keepalive"])  if target is "deploy"
-    grunt.task.run [
-        "clean:server", 
-        "coffee:deploy", 
-        "jade", 
-        "stylus", 
-        "livereload-start", 
-        "connect:livereload", 
-        "open", 
-        "watch"]
-
-  grunt.registerTask "scott", [
-      "clean:deploy", 
-      "coffee", 
-      "jade", 
-      "stylus", 
-      "imagemin", 
-      "copy:server", 
-      "livereload-start", 
-      "open", 
-      "connect:livereload", 
-      "watch"
+  grunt.registerTask "release", [
+    "clean:release",
+    "coffee",
+    "jade:release",
+    "stylus:release",
+    "copy:release"
   ]
 
-  grunt.registerTask "build", ["clean:deploy", "coffee", "jade", "stylus", 
-      "useminPrepare", "imagemin", "htmlmin", "cssmin", "uglify", "copy:deploy", "usemin"]
+  grunt.registerTask "debug", [
+    "clean:debug",
+    "coffee",
+    "jade:debug",
+    "stylus:debug"
+  ]
 
-  grunt.registerTask "default", ["jshint", "build"]
+  grunt.registerTask "debug-run", [
+    "clean:debug",
+    "coffee",
+    "jade:debug",
+    "stylus:debug",
+    "connect:livereload",
+    "open",
+    "livereload-start",
+    "watch"
+  ]
