@@ -1,9 +1,7 @@
-# Generated on 2013-03-11 using generator-webapp 0.1.5
 "use strict"
 lrSnippet = require("grunt-contrib-livereload/lib/utils").livereloadSnippet
 mountFolder = (connect, dir) ->
   connect.static require("path").resolve(dir)
-
 
 # # Globbing
 # for performance reasons we're only matching one level down:
@@ -135,13 +133,10 @@ module.exports = (grunt) ->
         options:
           compress: false
           paths: ["node_modules/grunt-contrib-stylus/node_modules"]
-
     
-    # not used since Uglify task does concat,
-    # but still available if needed
-    #concat: {
-    #            deploy: {}
-    #        },
+    # not used since Uglify task does concat, avail if needed
+    #concat: { deploy: {} },
+
     uglify:
       deploy:
         files:
@@ -175,16 +170,6 @@ module.exports = (grunt) ->
     htmlmin:
       deploy:
         options: {}
-        
-        #removeCommentsFromCDATA: true,
-        #                    // https://github.com/yeoman/grunt-usemin/issues/44
-        #                    //collapseWhitespace: true,
-        #                    collapseBooleanAttributes: true,
-        #                    removeAttributeQuotes: true,
-        #                    removeRedundantAttributes: true,
-        #                    useShortDoctype: true,
-        #                    removeEmptyAttributes: true,
-        #                    removeOptionalTags: true
         files: [
           expand: true
           cwd: "<%= yeoman.app %>"
@@ -216,6 +201,7 @@ module.exports = (grunt) ->
         rjsConfig: "<%= yeoman.app %>/scripts/main.js"
 
   grunt.renameTask "regarde", "watch"
+
   grunt.registerTask "server", (target) ->
     return grunt.task.run(["build", "open", "connect:deploy:keepalive"])  if target is "deploy"
     grunt.task.run [
@@ -243,4 +229,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask "build", ["clean:deploy", "coffee", "jade", "stylus", 
       "useminPrepare", "imagemin", "htmlmin", "cssmin", "uglify", "copy:deploy", "usemin"]
+
   grunt.registerTask "default", ["jshint", "build"]
