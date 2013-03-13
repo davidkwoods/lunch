@@ -208,6 +208,8 @@ module.exports = (grunt) ->
     "stylus:debug"
   ]
 
+  grunt.registerTask "default", ["debug-run"]
+
   grunt.registerTask "debug-run", [
     "clean:debug",
     "coffee",
