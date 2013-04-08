@@ -1,4 +1,4 @@
-# vim: ts=2 sw=2 et :
+# vim: ts=4 sw=4 noet :
 "use strict"
 lrSnippet = require("grunt-contrib-livereload/lib/utils").livereloadSnippet
 mountFolder = (connect, dir) ->
@@ -34,6 +34,10 @@ module.exports = (grunt) ->
 			stylus:
 				files: [c.source + "/*.styl"]
 				tasks: ["stylus:debug"]
+
+			m2j:
+				files: [c.source + "/articles/*.md"]
+				tasks: ["m2j:debug"]
 
 			livereload:
 				files: [".tmp/*.html", ".tmp/*.css", 
@@ -138,11 +142,6 @@ module.exports = (grunt) ->
 		# not used since Uglify task does concat, avail if needed
 		#concat: { deploy: {} },
 
-		uglify:
-			deploy:
-				files:
-					c.release + "/scripts/main.js": [c.source + "/scripts/{,*/}*.js"]
-
 		useminPrepare:
 			html: c.source + "/index.html"
 			options:
@@ -188,25 +187,71 @@ module.exports = (grunt) ->
 					src: ["logo", "*.{ico,txt}", "**/*.{,svg,png,jpg}", ".htaccess"]
 				]
 
+		compliment: [
+				'You are so awesome',
+				'You are handsome',
+				'You are witty'
+		]
+
+		mkdir: [
+				'tmp'
+		]
+
+		uglify:
+			release: 
+				src: [c.source + "/scripts/*.js", ".tmp/scripts/*.js"]
+				dest: c.release + "/scripts/main.js"
+
+		m2j: 
+			release: 
+				options:
+					minify:false
+					width:80
+				src: [c.source + "/articles/*.md"]
+				dest: c.release + "/articles.json"
+
+			debug: 
+				src: [c.source + "/articles/*.md"]
+				dest: c.tmp + "/articles.json"
+
 		bower:
 			all:
 				rjsConfig: c.source + "/scripts/main.js"
 
 	grunt.renameTask "regarde", "watch"
 
+	grunt.registerTask "mj", ["m2j"]
+
+	grunt.registerTask "compliment", "Treat yo\' self", ->
+		mydefaults = ['No one cares'];
+		compliments = grunt.config('compliment') || mydefaults;
+		index = Math.floor(Math.random() * compliments.length);
+
+		grunt.log.writeln(compliments[index]);
+
+	grunt.registerTask "mkdir", "Make a new directory", ->
+		dirs = grunt.config('mkdir');
+		dirs.forEach (name) ->
+			grunt.file.mkdir(name);
+			grunt.log.writeln("Created folder: " + name);
+	  
+
 	grunt.registerTask "release", [
 		"clean:release",
 		"coffee",
 		"jade:release",
 		"stylus:release",
-		"copy:release"
+		"copy:release",
+		"m2j:release",
+		"uglify:release"
 	]
 
 	grunt.registerTask "debug", [
 		"clean:debug",
 		"coffee",
 		"jade:debug",
-		"stylus:debug"
+		"stylus:debug",
+		"m2j:debug"
 	]
 
 	grunt.registerTask "default", ["debug-run"]
@@ -216,6 +261,7 @@ module.exports = (grunt) ->
 		"coffee",
 		"jade:debug",
 		"stylus:debug",
+		"m2j:debug",
 		"connect:livereload",
 		"open",
 		"livereload-start",
