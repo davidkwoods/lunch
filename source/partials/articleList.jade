@@ -1,0 +1,22 @@
+.searchtable
+  | All:
+  input(ng-model='searchAll', ng-init='searchAll = ""', placeholder='Search for anything')
+  br
+  | Title:
+  input(ng-model='searchTitle', ng-init='searchTitle = ""', placeholder='Filter by title')
+  br
+  | Author:
+  input(ng-model='searchAuthor', ng-init='searchAuthor = ""', placeholder='Filter by author name')
+  br
+  | Tag:
+  input(ng-model='searchTag', ng-init='searchTag = ""', placeholder='Filter by tag')
+
+ul.nodots
+  li(ng-repeat='article in articles | filter:{$:searchAll,author:searchAuthor,tags:searchTag,title:searchTitle}')
+    a(href='#/articles/{{article.basename}}')
+      div
+        h2 {{article.title}}
+        h4 {{article.author}} - {{article.date | date:medium}}
+        ul
+          li(ng-repeat='tag in article.tags') {{tag}}
+        | {{article.preview}}

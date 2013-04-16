@@ -28,7 +28,7 @@ module.exports = function(grunt) {
                 tasks: ["coffee:test"]
             },
             jade: {
-                files: [c.source + "/*.jade"],
+                files: [c.source + "/**/*.jade"],
                 tasks: ["jade:debug"]
             },
             stylus: {
@@ -88,7 +88,7 @@ module.exports = function(grunt) {
         },
         jade: {
             release: {
-                files: grunt.file.expandMapping(["*.jade"], c.release + "/", {
+                files: grunt.file.expandMapping(["*.jade","partials/*.jade"], c.release + "/", {
                     cwd: c.source,
                     rename: function(base, path) {
                         return base + path.replace(/\.jade$/, ".html");
@@ -103,7 +103,7 @@ module.exports = function(grunt) {
                 }
             },
             debug: {
-                files: grunt.file.expandMapping(["*.jade"], c.tmp + "/", {
+                files: grunt.file.expandMapping(["*.jade","partials/*.jade"], c.tmp + "/", {
                     cwd: c.source,
                     rename: function(base, path) {
                         return base + path.replace(/\.jade$/, ".html");
@@ -217,11 +217,12 @@ module.exports = function(grunt) {
         mkdir: [c.tmp],
         m2j: {
             release: {
-                options: { minify: false, width: 80 },
+                options: { minify: false, width: 80, asArray: true },
                 src: [c.source + "/articles/*.md"],
                 dest: c.release + "/articles.json"
             },
             debug: {
+                options: { asArray: true },
                 src: [c.source + "/articles/*.md"],
                 dest: c.tmp + "/articles.json"
             }

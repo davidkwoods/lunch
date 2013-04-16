@@ -1,0 +1,26 @@
+doctype 5
+html(ng-app='articleApp')
+  head
+    meta(charset='utf-8')
+    title= "Articles"
+    
+    // build:css(tmp) style.css
+    link(rel='stylesheet', href='styles/normalize.css')
+    link(rel='stylesheet', href='styles/h5bp.css')
+    link(rel='stylesheet', href='styles/g.css')
+    // endbuild
+    
+    script(src='lib/angular/angular.js')
+    script(src='scripts/articles/app.js')
+    script(src='scripts/articles/controllers.js')
+    
+  body
+    div(ng-view)
+  
+    nav
+      h4.
+        Nav section
+      :markdown
+        [Home](index.html)
+      :markdown
+        [Articles](articles.html)

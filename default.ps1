@@ -2,12 +2,16 @@ Task default -depends all
 
 Task all -depends release, deploy
 
-Task run -depends all {
-	Exec { grunt }
+Task run {
+	Exec { grunt debug-run }
 }
  
 Task release {
 	Exec { grunt release }
+}
+
+Task debug {
+  Exec { grunt debug }
 }
 
 Task deploy { # -depends release {
