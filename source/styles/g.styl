@@ -7,6 +7,7 @@ $whiteish = hsl(0, 50, 99)
 $blackish = hsl(0, 0, 7)
 $logocolor = hsl(202, 100%, 38%)
 $logocolorfaded = rgba(0, 125, 195, 0.05)
+$whitishfaded = rgba(254, 351, 251, 0.1)
 
 $redish   = spin($logocolor, 180%)
 $headercolor = $logocolor
@@ -103,9 +104,15 @@ nav
   top 0px
   bottom 0px
   padding 10px
+  width 100px
   background-color $logocolorfaded
 
-nav p,.searchtable p
+.articleNav
+  left 100px
+  width 275px
+  background-color $whitishfaded
+
+nav p
   margin-bottom 0rem
 
 ul.nodots

@@ -1,4 +1,4 @@
-.searchtable
+nav.articleNav
   | All:
   input(ng-model='searchAll', ng-init='searchAll = ""', placeholder='Search for anything')
   br
@@ -10,6 +10,13 @@
   br
   | Tag:
   input(ng-model='searchTag', ng-init='searchTag = ""', placeholder='Filter by tag')
+  
+  h4 Tags
+  ul.nodots
+    li
+      a(href='',ng-click='searchTag = "";')[x]
+    li(ng-repeat='tag in tags')
+      a(href="",ng-click="setSearchTag(tag);"){{tag}}
 
 ul.nodots
   li(ng-repeat='article in articles | filter:{$:searchAll,author:searchAuthor,tags:searchTag,title:searchTitle}')
