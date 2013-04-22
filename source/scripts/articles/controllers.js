@@ -34,7 +34,7 @@ ArticleListController.$inject = ['$scope', '$http'];
 
 
 function ArticleDetailController($scope, $routeParams, $http) {
-  $http.get('articles/' + $routeParams.articleId + '.md').success(function(data) {
+  $http.get('articles/' + $routeParams.articleId + '.json').success(function(data) {
     $scope.article = data;
   });
 }

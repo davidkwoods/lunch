@@ -39,6 +39,10 @@ module.exports = function(grunt) {
                 files: [c.source + "/articles/*.md"],
                 tasks: ["m2j:debug"]
             },
+            yfm2js: {
+                files: [c.source + "/articles/*.md"],
+                tasks: ["yfm2js:debug"]
+            },
             livereload: {
                 files: [c.tmp + "/**/*.*", "tmp/scripts/{,*/}*.js", 
                         c.source + "/images/{,*/}*.{png,svg,jpg,jpeg,webp}"],
@@ -227,6 +231,26 @@ module.exports = function(grunt) {
                 dest: c.tmp + "/articles.json"
             }
         },
+        yfm2js: {
+            release: {
+                files: [{
+                    expand:true,
+                    cwd: c.source,
+                    dest: c.release,
+                    src: ["articles/*.md"],
+                    ext: ".json"
+                }]
+            },
+            debug: {
+                files: [{
+                    expand:true,
+                    cwd: c.source,
+                    dest: c.tmp,
+                    src: ["articles/*.md"],
+                    ext: ".json"
+                }]
+            }
+        },
     });
 
     grunt.renameTask("regarde", "watch");
@@ -252,6 +276,7 @@ module.exports = function(grunt) {
             "jade:release", 
             "stylus:release", 
             "m2j:release", 
+            "yfm2js:release", 
             "copy:release", 
             "useminPrepare",
             "concat",
@@ -259,9 +284,9 @@ module.exports = function(grunt) {
             "rev",
             "usemin"
             ]);
-    grunt.registerTask("debug", ["clean:debug", "coffee", "jade:debug", "stylus:debug", "m2j:debug"]);
+    grunt.registerTask("debug", ["clean:debug", "coffee", "jade:debug", "stylus:debug", "m2j:debug", "yfm2js:debug"]);
     grunt.registerTask("default", ["debug-run"]);
 
-    grunt.registerTask("debug-run", ["clean:debug", "coffee", "jade:debug", "stylus:debug", "m2j:debug", "connect:livereload", "open", "livereload-start", "watch"]);
+    grunt.registerTask("debug-run", ["clean:debug", "coffee", "jade:debug", "stylus:debug", "m2j:debug", "yfm2js:debug", "connect:livereload", "open", "livereload-start", "watch"]);
 };
 
